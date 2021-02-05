@@ -19,7 +19,7 @@ func main() {
         "ids": "{{ $sessionId }}"
     },
     "running_variables": {
-    	"tid" : "{{ getId $sessionId }}"
+    	"tid": "{{ getId 5000 }}"
     },
     "func_set": [
         {
@@ -37,8 +37,8 @@ func main() {
                "Content-Type": "application/json"
             },
             "url": "/post?name=gannicus",
-            "body": "{\"timeout\":{{ .tid }}}",
-            "validator": "{{ and  (eq .http_status_code 200) (eq .data.timeout \"100\") }}"
+            "body": "{\"timeout\":{{ .tid }}, \"retry\":true}",
+            "validator": "{{ and  (eq .http_status_code 200) (eq .data.timeout (.tid | toFloat64 ) ) (eq .data.retry false) }}"
         }
     ]
 }`

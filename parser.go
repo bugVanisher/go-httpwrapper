@@ -2,10 +2,9 @@ package httpwrapper
 
 import (
 	"bytes"
-	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/myzhan/boomer"
-	"github.com/rs/zerolog/log"
+	"log"
 	"math/rand"
 	"strings"
 	"text/template"
@@ -72,17 +71,7 @@ func init() {
 
 func (rs *RunScript) genVariables() Variables {
 	varsBytes, _ := jsoniter.Marshal(rs.Variables)
-	getId := func(sid int) int {
-		return rand.Intn(sid)
-	}
-	getSid := func() int64 {
-		return time.Now().Unix()
-	}
-	templateFunc := map[string]interface{}{
-		"getId":  getId,
-		"getSid": getSid,
-	}
-	t := template.Must(template.New("Variables").Funcs(templateFunc).Parse(string(varsBytes)))
+	t := template.Must(template.New("Variables").Funcs(TemplateFunc).Parse(string(varsBytes)))
 	var tmpBytes bytes.Buffer
 	_ = t.Execute(&tmpBytes, nil)
 	var variables Variables
@@ -90,7 +79,7 @@ func (rs *RunScript) genVariables() Variables {
 	decoder.UseNumber()
 	err := decoder.Decode(&variables)
 	if err != nil {
-		log.Fatal()
+		log.Fatal(err)
 	}
 	merged := make(map[string]interface{})
 	for k, v := range variables.InitVariables {
@@ -197,12 +186,11 @@ func (fs *FuncSet) getHeaders(v Variable) (hmap map[string]string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(hmap)
 	return hmap
 }
 
 func (fs *FuncSet) assertTrue(mapping map[string]interface{}) bool {
-	t := template.Must(template.New("Validator").Parse(fs.Validator))
+	t := template.Must(template.New("Validator").Funcs(TemplateFunc).Parse(fs.Validator))
 	var bs bytes.Buffer
 	//for _, v := range mapping {
 	//	fmt.Println(v, reflect.TypeOf(v))
