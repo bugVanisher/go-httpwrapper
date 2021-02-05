@@ -2,6 +2,7 @@ package httpwrapper
 
 import (
 	"bytes"
+	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/myzhan/boomer"
 	"github.com/rs/zerolog/log"
@@ -196,6 +197,7 @@ func (fs *FuncSet) getHeaders(v Variable) (hmap map[string]string) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(hmap)
 	return hmap
 }
 

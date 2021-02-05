@@ -75,12 +75,16 @@ func genReqAction(fs FuncSet) func() {
 			log.Fatalf("%v\n", err)
 		}
 
+		for k, v := range initHeaders {
+			request.Header.Set(k, v)
+		}
+
 		for k, v := range headers {
 			request.Header.Set(k, v)
 		}
 
 		if fs.RScript.Debug {
-			fmt.Println(formatRequest(request))
+			log.Println(formatRequest(request))
 		}
 
 		startTime := time.Now()
@@ -108,19 +112,21 @@ func genReqAction(fs FuncSet) func() {
 				for k, v := range res {
 					merged[k] = v
 				}
+
+				if fs.RScript.Debug {
+					log.Printf("Status Code: %d\n", response.StatusCode)
+					log.Println(string(body))
+
+				} else {
+					io.Copy(ioutil.Discard, response.Body)
+				}
+
 				if fs.assertTrue(merged) {
-					//fmt.Println("assert true", elapsed.Nanoseconds()/int64(time.Millisecond))
+					fmt.Println("assert true", elapsed.Nanoseconds()/int64(time.Millisecond))
 					boomer.RecordSuccess(fs.Key, strconv.Itoa(response.StatusCode),
 						elapsed.Nanoseconds()/int64(time.Millisecond), response.ContentLength)
 				}
 
-			}
-			if fs.RScript.Debug {
-				log.Printf("Status Code: %d\n", response.StatusCode)
-				log.Println(string(body))
-
-			} else {
-				io.Copy(ioutil.Discard, response.Body)
 			}
 
 			response.Body.Close()

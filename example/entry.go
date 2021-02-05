@@ -10,7 +10,7 @@ import (
 func main() {
 	start := time.Now()
 	templateJsonStr := `{
-    "debug": false,
+    "debug": true,
     "domain": "https://postman-echo.com",
     "declare": ["{{ $sessionId := getSid }}"],
     "init_variables": {
@@ -25,12 +25,9 @@ func main() {
         {
             "key": "getTest",
             "method": "GET",
-            "header":{
-               "Cookies": "{{ .tid }}"
-            },
             "url": "/get?name=gannicus&roomId={{ .roomId }}&age=10&tid={{ .tid }}",
             "body": "{\"timeout\":10000}",
-            "validator": "{{ and  (eq .http_status_code 200) (eq .age \"10\") }}"
+            "validator": "{{ and  (eq .http_status_code 200) (eq .args.age \"10\") }}"
         },
         {
             "key": "postTest",
