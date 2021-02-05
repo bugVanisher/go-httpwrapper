@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"reflect"
 	"strconv"
 	"time"
 )
@@ -122,18 +121,12 @@ func genReqAction(fs FuncSet) func() {
 					io.Copy(ioutil.Discard, response.Body)
 				}
 
-				for k, v := range merged {
-					log.Println(k, reflect.TypeOf(v), v)
-					if k == "data" {
-						for kk, vv := range v.(map[string]interface{}) {
-							log.Println(kk, reflect.TypeOf(vv), vv)
-						}
-					}
-				}
 				if fs.assertTrue(merged) {
 					fmt.Println("assert true", elapsed.Nanoseconds()/int64(time.Millisecond))
 					boomer.RecordSuccess(fs.Key, strconv.Itoa(response.StatusCode),
 						elapsed.Nanoseconds()/int64(time.Millisecond), response.ContentLength)
+				} else {
+					boomer.RecordFailure("assert failed", fs.Key, elapsed.Nanoseconds()/int64(time.Millisecond), "")
 				}
 
 			}

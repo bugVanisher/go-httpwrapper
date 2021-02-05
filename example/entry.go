@@ -12,6 +12,7 @@ func main() {
 	templateJsonStr := `{
     "debug": true,
     "domain": "https://postman-echo.com",
+    "header":{},
     "declare": ["{{ $sessionId := getSid }}"],
     "init_variables": {
         "roomId": 1001,
@@ -19,7 +20,7 @@ func main() {
         "ids": "{{ $sessionId }}"
     },
     "running_variables": {
-    	"tid": "{{ getId 5000 }}"
+    	"tid": "{{ getRandomId 5000 }}"
     },
     "func_set": [
         {
@@ -27,7 +28,7 @@ func main() {
             "method": "GET",
             "url": "/get?name=gannicus&roomId={{ .roomId }}&age=10&tid={{ .tid }}",
             "body": "{\"timeout\":10000}",
-            "validator": "{{ and  (eq .http_status_code 200) (eq .args.age \"10\") }}"
+            "validator": "{{ and  (eq .http_status_code 200) (eq .args.age (10 | toString )) }}"
         },
         {
             "key": "postTest",

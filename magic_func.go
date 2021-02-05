@@ -7,15 +7,16 @@ import (
 )
 
 var TemplateFunc = map[string]interface{}{
-	"getId":     getId,
-	"getSid":    getSid,
-	"toFloat64": cast.ToFloat64,
+	"getRandomId": getRandomId,
+	"getSid":      getSid,
+	"toFloat64":   cast.ToFloat64,
+	"toString":    cast.ToString,
 }
 
 func getSid() int64 {
 	return time.Now().Unix()
 }
 
-func getId(id int) int {
+func getRandomId(id int) int {
 	return rand.Intn(id)
 }
